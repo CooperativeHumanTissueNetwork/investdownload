@@ -1,0 +1,103 @@
+<?php
+
+class processor { 
+
+    function functiondefinitions() {
+        	$rows = array();
+        	$rows[] = array('functionName' => 'listfunctions', 'description' => 'A simple listing of functions names in this end point', 'variables' => 'none');
+        	$rows[] = array('functionName' => 'gettable', 'description' => 'Blah Blah', 'variables' => 'tablename');
+        	$arrResponse = array('DATA' => $rows);
+        	$collection = json_encode($arrResponse);
+        	return $collection;
+    	}
+	
+    function buildTmpTblSQL($tblName, $tblDefinition) { 
+            $tblDefData = json_decode($tblDefinition, true);
+            $pkey = "";
+            $ddl = "";
+            $ddlStmt = "";
+            for ($i = 0; $i < count($tblDefData); $i++) {
+                switch ($tblDefData[$i]['DATA_TYPE']) { 
+                    case 'VARCHAR2': 
+                        $fldType = "varchar(" . $tblDefData[$i]['DATA_LENGTH'] . ")";
+                        break;
+                    case 'DATE': 
+                        $fldType = "datetime";
+                        break;
+                    case 'CLOB': 
+                        $fldType = "blob";
+                        break;                    
+                    default: 
+                        $fldType = "varchar(150)";
+                }
+                $nullable = ($tblDefData[$i]['NULLABLE'] === 'N') ? 'NOT NULL' : 'DEFAULT NULL';
+                if ($tblDefData[$i]['PKEY'] === 'X') $pkey = ", PRIMARY KEY (" . $tblDefData[$i]['COLUMN_NAME'] . ") "; 
+                if ($ddl === "") {
+                        $ddl .= strtolower($tblDefData[$i]['COLUMN_NAME']) . " " . $fldType . " " . $nullable;
+                } else { 
+                        $ddl .= "," . strtolower($tblDefData[$i]['COLUMN_NAME']) . " " . $fldType . " " . $nullable; 
+                }
+            }
+            $ddlStmt .= "CREATE TABLE vandywstest.tmp_" . $tblName  . " (" . $ddl . $pkey . ") ENGINE=myISAM DEFAULT CHARSET=utf8";
+            return $ddlStmt;
+        }
+
+    function runSQL($tblName, $sqlStmt) { 
+        include 'auth.zck';
+        $url = "https://www.chtneast.org/fourapi/vandyinvest/sendsqlCreateTbl";
+        $arrResponse = array('tblName' => 'tmp_'.$tblName,'buildSQL' => $sqlStmt, 'auth' => $authCHTNEast);
+        $collection = json_encode($arrResponse);
+        $tblDefRtn = callRestAPI('POST',$url, $collection);
+        return $tblDefRtn;
+    }    
+
+    function runSQLLoad($tblName, $sqlStmt) { 
+        include 'auth.zck';
+        $url = "https://www.chtneast.org/fourapi/vandyinvest/loadTmpTable";
+        $arrResponse = array('tblName' => 'tmp_'.$tblName,'insertSQL' => $sqlStmt, 'auth' => $authCHTNEast);
+        $collection = json_encode($arrResponse);
+        $tblDefRtn = callRestAPI('POST',$url, $collection);
+        echo $sqlStmt;
+        return $tblDefRtn;                
+    }
+    
+    function parseTblRecords($tblName, $records) {
+        $data  = json_decode($records, true); 
+        $fieldData = "";
+        $fieldList = "";
+        foreach($data[0] as $key => $value) { 
+            if ($fieldList === "") { 
+                $fieldList = strtolower($key);
+            } else { 
+                $fieldList .= ", " . strtolower($key);
+            }
+        }
+        $dataList = "";
+        for ($i = 0; $i < count($data); $i++) {
+            if ($dataList === "") { 
+                $dataList .= "(";
+            } else { 
+                $dataList .= ",(";    
+            }
+            $valueCnt = 0;
+            foreach($data[$i] as $key => $value) { 
+                if ($valueCnt === 0) { 
+                    $dataList .=  "'" . addslashes(trim($value)) . "'";
+                } else { 
+                    $dataList .=  ",'" . addslashes(trim($value)) . "'";
+                }
+                $valueCnt += 1; 
+            }
+            $dataList .= ")  ";
+        }            
+            $sqlToSend = " insert into vandywstest.tmp_" . $tblName . " "
+                    . "(" . $fieldList . ") values " . $dataList;
+        return $sqlToSend;
+    }
+
+
+}
+
+
+
+

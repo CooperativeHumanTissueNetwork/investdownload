@@ -1,0 +1,76 @@
+<?php
+
+
+class table { 
+
+    function functiondefinitions() {
+        $rows = array();
+        $rows[] = array('functionName' => 'listfunctions', 'description' => 'A simple listing of functions names in this end point', 'variables' => 'none');
+        $rows[] = array('functionName' => 'gettable', 'description' => 'Blah Blah', 'variables' => 'tablename');
+        $arrResponse = array('DATA' => $rows);
+        $collection = json_encode($arrResponse);
+        return $collection;
+    }
+
+    function getTableData($whichtable) { 
+        include 'auth.zck';
+        $passThis = json_encode(array("sql" => "select * from INVESTIGATOR." . strtoupper($whichtable) . " where rownum < 6", 'auth' => $authCHTNTQ));
+        $url = "https://chtn.app.vumc.org/tq-data-services/query";
+        $ws = callRestAPI('POST',$url, $passThis);
+        return $ws;  
+    } 
+
+    function getTableDefinitions($whichTable) { 
+        include 'auth.zck';
+        if ($whichTable === 'project_noabstract') {
+            //THIS DOESN'T WORK PROBABLY WRONG OWNER IN DB - REPLACE WITH EASTERN_PROJECT
+            $tblDefSQL = "select t.table_name ,t.column_name, t.data_type, t.data_length, t.nullable, CASE WHEN pk.column_name IS NULL THEN '-' ELSE 'X' END as pkey "
+                        . " from all_tab_columns t "
+                        . " left outer join (SELECT A.COLUMN_NAME, A.TABLE_NAME as table_name "
+                        . "                     FROM ALL_CONS_COLUMNS A JOIN ALL_CONSTRAINTS C  ON A.CONSTRAINT_NAME = C.CONSTRAINT_NAME "
+                        . "                     where C.CONSTRAINT_TYPE = 'P') pk on (t.table_name = pk.table_name and t.column_name = pk.column_name) "
+                        . " where t.table_name = '" . strtoupper($whichTable) . "'";
+            $passThis = json_encode(array("sql" => $tblDefSQL, "auth" => $authCHTNTQ));
+            $url = "https://chtn.app.vumc.org/tq-data-services/query";
+            $tblDefRtn = callRestAPI('POST',$url, $passThis);
+            return $tblDefRtn;
+        } else {
+            $tblDefSQL = "select t.table_name ,t.column_name, t.data_type, t.data_length, t.nullable, CASE WHEN pk.column_name IS NULL THEN '-' ELSE 'X' END as pkey "
+                        . " from all_tab_columns t "
+                        . " left outer join (SELECT A.COLUMN_NAME, 'EASTERN_'||A.TABLE_NAME as table_name " 
+                        . " 			FROM ALL_CONS_COLUMNS A JOIN ALL_CONSTRAINTS C  ON A.CONSTRAINT_NAME = C.CONSTRAINT_NAME " 
+                        . " 			where C.CONSTRAINT_TYPE = 'P') pk on (t.table_name = pk.table_name and t.column_name = pk.column_name) "
+                        . " where t.owner = 'INVESTIGATOR' and t.table_name = '" . strtoupper($whichTable) . "'";
+            $passThis = json_encode(array("sql" => $tblDefSQL, "auth" => $authCHTNTQ));
+            $url = "https://chtn.app.vumc.org/tq-data-services/query";
+            $tblDefRtn = callRestAPI('POST',$url, $passThis);
+            return $tblDefRtn;
+        }
+    }
+
+}
+
+function callRestAPI($method, $url, $data = false) { 
+    try {
+        $ch = curl_init();
+        if (FALSE === $ch) throw new Exception('failed to initialize');
+        switch ($method) { 
+            case "POST":
+            curl_setopt($ch, CURLOPT_POST, 1);
+            if ($data) {
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+            }
+            break;
+        } 
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);        
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        $content = curl_exec($ch);
+        if (FALSE === $content) throw new Exception(curl_error($ch), curl_errno($ch));
+        return $content;
+    } catch(Exception $e) {
+        trigger_error(sprintf('Curl failed with error #%d: %s',$e->getCode(), $e->getMessage()),E_USER_ERROR);
+    }
+}
+

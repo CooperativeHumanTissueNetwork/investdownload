@@ -1,0 +1,31 @@
+#!/usr/bin/php
+<?php
+include 'tablelisting';	
+include 'tables';
+include 'processors';
+
+
+$tableDataList = json_decode($tableCollection, true);
+for ($i = 0; $i < count($tableDataList['DATA']); $i++) { 
+	$tbl = new table(); 
+        $prc = new processor();
+
+        //BUILD TMP HOLDER TABLES FROM TQ DATA STRUCTURE
+        $dataTblDef = $tbl->getTableDefinitions($tableDataList['DATA'][$i]['table']);          
+        $sqlStatement = $prc->buildTmpTblSQL($tableDataList['DATA'][$i]['table'], $dataTblDef);
+        $rtn = $prc->runSQL($tableDataList['DATA'][$i]['table'], $sqlStatement);        
+        echo $rtn;
+        
+        //LOAD TEMPORARY TABLES FROM TQ
+        $dataTbl = $tbl->getTableData($tableDataList['DATA'][$i]['table']);
+        $loadSQL = $prc->parseTblRecords($tableDataList['DATA'][$i]['table'],$dataTbl);
+        $rtnLoad = $prc->runSQLLoad($tableDataList['DATA'][$i]['table'], $loadSQL);        
+        echo $rtnLoad;
+        
+}
+
+//CHECK MAKE SURE RECORDS EXIST
+//DROP YESTERDAY TABLES
+//MOVE EXISTING TABLES TO YESTERDAY
+//MOVE TMP TO TODAY
+//BUILD INDICES ON TODAY TABLES
