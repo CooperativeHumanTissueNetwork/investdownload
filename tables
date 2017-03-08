@@ -14,7 +14,8 @@ class table {
 
     function getTableData($whichtable) { 
         include 'auth.zck';
-        $passThis = json_encode(array("sql" => "select * from INVESTIGATOR." . strtoupper($whichtable) . " where rownum < 6", 'auth' => $authCHTNTQ));
+        $passThis = json_encode(array("sql" => "select * from INVESTIGATOR." . strtoupper($whichtable) . "", 'auth' => $authCHTNTQ));
+        //$passThis = json_encode(array("sql" => "select * from INVESTIGATOR." . strtoupper($whichtable) . " where rownum < 6", 'auth' => $authCHTNTQ));
         $url = "https://chtn.app.vumc.org/tq-data-services/query";
         $ws = callRestAPI('POST',$url, $passThis);
         return $ws;  
