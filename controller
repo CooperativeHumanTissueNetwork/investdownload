@@ -77,7 +77,19 @@ for ($i = 0; $i < count($tableDataList['DATA']); $i++) {
 }
 
 
-//BUILD SPECIAL INDICES ON TODAY TABLES
+//BUILD SPECIAL INDICES ON TODAY TABLES and REGISTER ACTIVES
 $sql = "ALTER TABLE vandywstest.invest ADD FULLTEXT INDEX fullname (investid ASC, invest_division ASC, invest_status ASC, invest_homeinstitute ASC, invest_fname ASC, invest_lname ASC)";
 $rtnLoad = $prc->buildspecialindices($sql);        
+echo $rtnLoad . "\r\n";
+
+$aSQLOne = "insert into vandywstest.activeinvest SELECT i.*, now() FROM vandywstest.invest i left outer join vandywstest.activeinvest ai on i.investid = ai.investid where i.invest_status = 'Active' and ai.investid is null";
+$rtnLoad = $prc->registeractivesinvests($aSQLOne);
+echo $rtnLoad . "\r\n";
+
+$aSQLTwo = "insert into vandywstest.activeinvestproj SELECT pr.*, now() FROM vandywstest.investproj pr left outer join vandywstest.activeinvestproj apr on pr.projid = apr.projid where pr.proj_status = 'Active' and apr.projid is null";
+$rtnLoad = $prc->registeractivesinvests($aSQLTwo);
+echo $rtnLoad . "\r\n";
+
+$aSQLThree = "insert into vandywstest.activeinvesttissreq SELECT rq.*, now() FROM vandywstest.investtissreq rq left outer join vandywstest.activeinvesttissreq arq on rq.requestid = arq.requestid where rq.req_status = 'Active' and arq.requestid is null";
+$rtnLoad = $prc->registeractivesinvests($aSQLThree);
 echo $rtnLoad . "\r\n";
