@@ -72,6 +72,15 @@ class processor {
         return $tblDefRtn; 
     }
     
+    function runToYesterdayList($tblName, $sqlStmt) { 
+        include 'auth.zck';
+        $url = "https://www.chtneast.org/fourapi/vandyinvest/makeyesterdaytbl";
+        $arrResponse = array('tblName' => $tblName,'SQL' => $sqlStmt, 'auth' => $authCHTNEast);
+        $collection = json_encode($arrResponse);
+        $tblDefRtn = callRestAPI('POST',$url, $collection);
+        return $tblDefRtn;        
+    }
+    
     function parseTblRecords($tblName, $records) {
         $data  = json_decode($records, true); 
         $fieldData = "";

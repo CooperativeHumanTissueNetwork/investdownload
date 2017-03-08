@@ -54,8 +54,8 @@ for ($i = 0; $i < count($tableDataList['DATA']); $i++) {
     }
     
     $sql = "ALTER TABLE vandywstest." . $tblname . " RENAME TO vandywstest.yesterday_" . $tblname;
-    echo $sql . "\r\n";
-    //$rsp = $prc->runDropList($tblname,'DROP TABLE IF EXISTS vandywstest.yesterday_' . $tblname);
+    $rsp = $prc->runToYesterdayList($tblname,$sql);
+    echo $rsp . "\r\n";
     
 }
 
