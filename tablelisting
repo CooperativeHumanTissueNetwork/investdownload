@@ -1,18 +1,18 @@
 <?php 
 
 $rows[] = array('table' => 'eastern_address', 'description' => 'Investigator Address Table');
-//$rows[] = array('table' => 'eastern_contact', 'description' => 'Investigator Contacts Table');
+$rows[] = array('table' => 'eastern_contact', 'description' => 'Investigator Contacts Table');
 //$rows[] = array('table' => 'eastern_courier', 'description' => 'Courier/Shipping Information');
 //$rows[] = array('table' => 'eastern_funding', 'description' => 'Investigator Address Table');
 //$rows[] = array('table' => 'eastern_payment', 'description' => 'Investigator Address Table');
-//$rows[] = array('table' => 'eastern_project', 'description' => 'Investigator Address Table');
+$rows[] = array('table' => 'eastern_project', 'description' => 'Investigator Address Table');
 //$rows[] = array('table' => 'eastern_prepadditive', 'description' => 'Investigator Address Table');
 //$rows[] = array('table' => 'eastern_reqdifficulty', 'description' => 'Investigator Address Table');
 //$rows[] = array('table' => 'eastern_reqreviewtype', 'description' => 'Investigator Address Table');
 //$rows[] = array('table' => 'eastern_tissuedetail', 'description' => 'Investigator Address Table');
 //$rows[] = array('table' => 'eastern_tissueprep', 'description' => 'Investigator Address Table');
 $rows[] = array('table' => 'eastern_investigator', 'description' => 'Investigator Address Table');
-//$rows[] = array('table' => 'eastern_tissuerequest', 'description' => 'Investigator Address Table');
+$rows[] = array('table' => 'eastern_tissuerequest', 'description' => 'Investigator Address Table');
 
 $arrResponse = array('DATA' => $rows);
 $tableCollection = json_encode($arrResponse);

@@ -44,7 +44,7 @@ class processor {
 
     function runSQL($tblName, $sqlStmt) { 
         include 'auth.zck';
-        $url = "https://www.chtneast.org/fourapi/vandyinvest/sendsqlCreateTbl";
+        $url = "https://www.chtneast.org/fourapi/vandyinvest/sendsqlcreatetbl";
         $arrResponse = array('tblName' => 'tmp_'.$tblName,'buildSQL' => $sqlStmt, 'auth' => $authCHTNEast);
         $collection = json_encode($arrResponse);
         $tblDefRtn = callRestAPI('POST',$url, $collection);
@@ -53,12 +53,23 @@ class processor {
 
     function runSQLLoad($tblName, $sqlStmt) { 
         include 'auth.zck';
-        $url = "https://www.chtneast.org/fourapi/vandyinvest/loadTmpTable";
+        $url = "https://www.chtneast.org/fourapi/vandyinvest/loadtmptable";
         $arrResponse = array('tblName' => 'tmp_'.$tblName,'insertSQL' => $sqlStmt, 'auth' => $authCHTNEast);
         $collection = json_encode($arrResponse);
         $tblDefRtn = callRestAPI('POST',$url, $collection);
         echo $sqlStmt;
         return $tblDefRtn;                
+    }
+
+    function runDropList($tblName, $sqlStmt) {
+        include 'auth.zck';
+        $url = "https://www.chtneast.org/fourapi/vandyinvest/movetbldrops";
+        $arrResponse = array('tblName' => $tblName,'dropSQL' => $sqlStmt, 'auth' => $authCHTNEast);
+        $collection = json_encode($arrResponse);
+        $tblDefRtn = callRestAPI('POST',$url, $collection);
+        //echo $sqlStmt;
+        //$tblDefRtn = 1;
+        return $tblDefRtn; 
     }
     
     function parseTblRecords($tblName, $records) {
@@ -94,7 +105,6 @@ class processor {
                     . "(" . $fieldList . ") values " . $dataList;
         return $sqlToSend;
     }
-
 
 }
 

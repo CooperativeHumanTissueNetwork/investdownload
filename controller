@@ -4,28 +4,61 @@ include 'tablelisting';
 include 'tables';
 include 'processors';
 
-
 $tableDataList = json_decode($tableCollection, true);
+$tbl = new table(); 
+$prc = new processor();
 for ($i = 0; $i < count($tableDataList['DATA']); $i++) { 
-	$tbl = new table(); 
-        $prc = new processor();
-
         //BUILD TMP HOLDER TABLES FROM TQ DATA STRUCTURE
-        $dataTblDef = $tbl->getTableDefinitions($tableDataList['DATA'][$i]['table']);          
-        $sqlStatement = $prc->buildTmpTblSQL($tableDataList['DATA'][$i]['table'], $dataTblDef);
-        $rtn = $prc->runSQL($tableDataList['DATA'][$i]['table'], $sqlStatement);        
-        echo $rtn;
+        //$dataTblDef = $tbl->getTableDefinitions($tableDataList['DATA'][$i]['table']);          
+        //$sqlStatement = $prc->buildTmpTblSQL($tableDataList['DATA'][$i]['table'], $dataTblDef);
+        //$rtn = $prc->runSQL($tableDataList['DATA'][$i]['table'], $sqlStatement);        
+        //echo $rtn;
         
         //LOAD TEMPORARY TABLES FROM TQ
-        $dataTbl = $tbl->getTableData($tableDataList['DATA'][$i]['table']);
-        $loadSQL = $prc->parseTblRecords($tableDataList['DATA'][$i]['table'],$dataTbl);
-        $rtnLoad = $prc->runSQLLoad($tableDataList['DATA'][$i]['table'], $loadSQL);        
-        echo $rtnLoad;
+        //$dataTbl = $tbl->getTableData($tableDataList['DATA'][$i]['table']);
+        //$loadSQL = $prc->parseTblRecords($tableDataList['DATA'][$i]['table'],$dataTbl);
+        //$rtnLoad = $prc->runSQLLoad($tableDataList['DATA'][$i]['table'], $loadSQL);        
+        //echo $rtnLoad;
         
 }
 
-//CHECK MAKE SURE RECORDS EXIST
-//DROP YESTERDAY TABLES
-//MOVE EXISTING TABLES TO YESTERDAY
+//(NOT IN THIS RELEASE) CHECK MAKE SURE RECORDS EXIST 
+
+for ($i = 0; $i < count($tableDataList['DATA']); $i++) { 
+    //DROP YESTERDAY TABLES
+    //$tblname = $tableDataList['DATA'][$i]['table'];
+    //if (strtolower($tableDataList['DATA'][$i]['table']) === 'eastern_investigator') {
+    //    $tblname = "invest";
+    //}
+    //if (strtolower($tableDataList['DATA'][$i]['table']) === 'eastern_project') {
+    //    $tblname = "investproj";
+    //}
+    //if (strtolower($tableDataList['DATA'][$i]['table']) === 'eastern_tissuerequest') {
+    //    $tblname = "investtissreq";
+    //}
+    //$rsp = $prc->runDropList($tblname,'DROP TABLE IF EXISTS vandywstest.yesterday_' . $tblname);
+    //echo $rsp;    
+}
+
+for ($i = 0; $i < count($tableDataList['DATA']); $i++) { 
+    //MOVE EXISTING TABLES TO YESTERDAY
+    $tblname = $tableDataList['DATA'][$i]['table'];
+    if (strtolower($tableDataList['DATA'][$i]['table']) === 'eastern_investigator') {
+        $tblname = "invest";
+    }
+    if (strtolower($tableDataList['DATA'][$i]['table']) === 'eastern_project') {
+        $tblname = "investproj";
+    }
+    if (strtolower($tableDataList['DATA'][$i]['table']) === 'eastern_tissuerequest') {
+        $tblname = "investtissreq";
+    }
+    
+    $sql = "ALTER TABLE vandywstest." . $tblname . " RENAME TO vandywstest.yesterday_" . $tblname;
+    echo $sql . "\r\n";
+    //$rsp = $prc->runDropList($tblname,'DROP TABLE IF EXISTS vandywstest.yesterday_' . $tblname);
+    
+}
+
+
 //MOVE TMP TO TODAY
 //BUILD INDICES ON TODAY TABLES
