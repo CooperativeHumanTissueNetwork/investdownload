@@ -1,0 +1,165 @@
+<?php
+
+class vandyinvest {
+    
+    function sendsqlcreatetbl($filecontent) {
+        header('Content-Type: application/json; charset=utf8');
+        header('Access-Control-Allow-Origin: \"*\"');
+        header('Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept');
+        header('Access-Control-Max-Age: 3628800');
+        header('Access-Control-Allow-Methods: GET');
+        $dataQry = json_decode($filecontent, true);
+        require_once '/var/www/connstr/cpdataconn.zck';
+        if ((int)$allowInd === 1) { 
+            $rcdR = mysql_query("DROP TABLE IF EXISTS xxDBNAMExx." . $dataQry['tblName'] . "", $conn) or die(mysql_error());
+            $rcdR = mysql_query($dataQry['buildSQL'], $conn) or die(mysql_error());
+            $rtnCode = (int)1;            
+        } else { 
+            $rtnCode = (int)0;
+        }
+        $arrResponse = array('returnCode' => $rtnCode, 'buildSQL' => $dataQry['tblName']);
+        $collection = json_encode($arrResponse);
+        return $collection;
+    }
+
+    function movetbldrops($filecontent) {
+        header('Content-Type: application/json; charset=utf8');
+        header('Access-Control-Allow-Origin: \"*\"');
+        header('Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept');
+        header('Access-Control-Max-Age: 3628800');
+        header('Access-Control-Allow-Methods: GET');
+        $dataQry = json_decode($filecontent, true);
+        require_once '/var/www/connstr/cpdataconn.zck';
+        if ((int)$allowInd === 1) {             
+            $rcdR = mysql_query($dataQry['dropSQL'], $conn) or die(mysql_error());
+            $rtnCode = (int)1;            
+        } else { 
+            $rtnCode = (int)0;
+        }
+        $arrResponse = array('returnCode' => $rtnCode, 'SQL' => $dataQry['dropSQL']);
+        $collection = json_encode($arrResponse);
+        return $collection;        
+    }
+    
+    function loadTmpTable($filecontent) { 
+        header('Content-Type: application/json; charset=utf8');
+        header('Access-Control-Allow-Origin: \"*\"');
+        header('Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept');
+        header('Access-Control-Max-Age: 3628800');
+        header('Access-Control-Allow-Methods: GET');
+        $dataQry = json_decode($filecontent, true);
+        require_once '/var/www/connstr/cpdataconn.zck';
+        if ((int)$allowInd === 1) {             
+            $rcdR = mysql_query($dataQry['insertSQL'], $conn) or die(mysql_error());
+            $rtnCode = (int)1;            
+        } else { 
+            $rtnCode = (int)0;
+        }
+        $arrResponse = array('returnCode' => $rtnCode, 'insertSQL' => $dataQry['insertSQL']);
+        $collection = json_encode($arrResponse);
+        return $collection;        
+    }
+    
+    function makeyesterdaytbl($filecontent) { 
+        header('Content-Type: application/json; charset=utf8');
+        header('Access-Control-Allow-Origin: \"*\"');
+        header('Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept');
+        header('Access-Control-Max-Age: 3628800');
+        header('Access-Control-Allow-Methods: GET');
+        $dataQry = json_decode($filecontent, true);
+        require_once '/var/www/connstr/cpdataconn.zck';
+        if ((int)$allowInd === 1) {
+            //check table exists
+            $chkSQL = "SHOW TABLES LIKE '" . $dataQry['tblName'] . "'";
+            $chkR = mysql_query($chkSQL, $conn) or die(mysql_error()); 
+            if (mysql_num_rows($chkR) > 0) { 
+                $rcdR = mysql_query($dataQry['SQL'], $conn) or die(mysql_error());
+                $rtnCode = (int)1;            
+            } else { 
+                $rtnCode = (int)2;            
+            }
+        } else { 
+            $rtnCode = (int)0;
+        }
+        $arrResponse = array('returnCode' => $rtnCode, 'SQL' => $dataQry['SQL']);
+        $collection = json_encode($arrResponse);
+        return $collection;        
+    }
+    
+    function buildspecindx($filecontent) { 
+        header('Content-Type: application/json; charset=utf8');
+        header('Access-Control-Allow-Origin: \"*\"');
+        header('Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept');
+        header('Access-Control-Max-Age: 3628800');
+        header('Access-Control-Allow-Methods: GET');
+        $dataQry = json_decode($filecontent, true);
+        require_once '/var/www/connstr/cpdataconn.zck';
+        if ((int)$allowInd === 1) {
+            $rcdR = mysql_query($dataQry['SQL'], $conn) or die(mysql_error());
+            $rtnCode = (int)1;            
+        }  else { 
+            $rtnCode = (int)0;
+        }
+        $arrResponse = array('returnCode' => $rtnCode, 'SQL' => $dataQry['SQL']);
+        $collection = json_encode($arrResponse);
+        return $collection;
+    }
+    
+    function maketodaytables($filecontent) { 
+        header('Content-Type: application/json; charset=utf8');
+        header('Access-Control-Allow-Origin: \"*\"');
+        header('Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept');
+        header('Access-Control-Max-Age: 3628800');
+        header('Access-Control-Allow-Methods: GET');
+        $dataQry = json_decode($filecontent, true);
+        require_once '/var/www/connstr/cpdataconn.zck';
+        if ((int)$allowInd === 1) {
+            //check table exists
+            $chkSQL = "SHOW TABLES LIKE '" . $dataQry['tblName'] . "'";
+            $chkR = mysql_query($chkSQL, $conn) or die(mysql_error()); 
+            if (mysql_num_rows($chkR) > 0) { 
+                $rcdR = mysql_query($dataQry['SQL'], $conn) or die(mysql_error());
+                $rtnCode = (int)1;            
+            } else { 
+                $rtnCode = (int)2;            
+            }
+        } else { 
+            $rtnCode = (int)0;
+        }
+        $arrResponse = array('returnCode' => $rtnCode, 'SQL' => $dataQry['SQL']);
+        $collection = json_encode($arrResponse);
+        return $collection;          
+    }
+    
+    function registeractives($filecontent) { 
+        header('Content-Type: application/json; charset=utf8');
+        header('Access-Control-Allow-Origin: \"*\"');
+        header('Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept');
+        header('Access-Control-Max-Age: 3628800');
+        header('Access-Control-Allow-Methods: GET');
+        $dataQry = json_decode($filecontent, true);
+        require_once '/var/www/connstr/cpdataconn.zck';
+        if ((int)$allowInd === 1) {
+            $rcdR = mysql_query($dataQry['SQL'], $conn) or die(mysql_error());
+            $rtnCode = (int)1;            
+        } else { 
+            $rtnCode = (int)0;
+        }
+        $arrResponse = array('returnCode' => $rtnCode, 'SQL' => $dataQry['SQL']);
+        $collection = json_encode($arrResponse);
+        return $collection;        
+    }
+    
+}
+
+$rs = file_get_contents('php://input');
+if ( (!isset($params[1]) || trim($params[1]) == "") ) {
+    $arrResponse = array('responseCode' => 203, 'DATA' => "noFunctionSpecified");
+    echo json_encode($arrResponse);
+} else { 
+        $dSearch = new vandyinvest();
+        $funcName = $params[1];
+        echo $dSearch->$funcName($rs);
+}
+
+

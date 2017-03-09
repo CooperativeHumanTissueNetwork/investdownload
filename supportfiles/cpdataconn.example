@@ -1,0 +1,10 @@
+<?php
+$conn = mysql_connect('xxx.xxx.xxx.xxx','xxxxxxxxx','xxxxxxxxx')  or die(mysql_error());
+mysql_select_db('xxDBNAMExx',$conn) or die(mysql_error());
+mysql_set_charset('utf8',$conn);
+$rq = explode(":",base64_decode($dataQry['auth']));
+if ($rq[0] === 'xxxxxx' && $rq[1] === 'xxxxxxxx') { 
+	$allowInd = 1; 
+} else { 
+	$allowInd = 0;
+}

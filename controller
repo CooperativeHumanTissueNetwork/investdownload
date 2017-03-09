@@ -37,7 +37,7 @@ for ($i = 0; $i < count($tableDataList['DATA']); $i++) {
     if (strtolower($tableDataList['DATA'][$i]['table']) === 'eastern_tissuerequest') {
         $tblname = "investtissreq";
     }
-    $rsp = $prc->runDropList($tblname,'DROP TABLE IF EXISTS vandywstest.yesterday_' . $tblname);
+    $rsp = $prc->runDropList($tblname,'DROP TABLE IF EXISTS vandyinvest.yesterday_' . $tblname);
     echo $rsp . "\r\n";    
 }
 
@@ -53,7 +53,7 @@ for ($i = 0; $i < count($tableDataList['DATA']); $i++) {
     if (strtolower($tableDataList['DATA'][$i]['table']) === 'eastern_tissuerequest') {
         $tblname = "investtissreq";
     }
-    $sql = "ALTER TABLE vandywstest." . $tblname . " RENAME TO vandywstest.yesterday_" . $tblname;
+    $sql = "ALTER TABLE vandyinvest." . $tblname . " RENAME TO vandyinvest.yesterday_" . $tblname;
     $rsp = $prc->runToYesterdayList($tblname,$sql);
     echo $rsp . "\r\n";    
 }
@@ -71,25 +71,25 @@ for ($i = 0; $i < count($tableDataList['DATA']); $i++) {
     if (strtolower($tableDataList['DATA'][$i]['table']) === 'eastern_tissuerequest') {
         $otblname = "investtissreq";
     }    
-    $sql = "ALTER TABLE vandywstest." .  strtolower($tblname) . " RENAME TO vandywstest." . strtolower($otblname) . "";
+    $sql = "ALTER TABLE vandyinvest." .  strtolower($tblname) . " RENAME TO vandyinvest." . strtolower($otblname) . "";
     $rsp = $prc->makeTodayList(strtolower($tblname), $sql);
     echo $rsp . "\r\n";
 }
 
 
 //BUILD SPECIAL INDICES ON TODAY TABLES and REGISTER ACTIVES
-$sql = "ALTER TABLE vandywstest.invest ADD FULLTEXT INDEX fullname (investid ASC, invest_division ASC, invest_status ASC, invest_homeinstitute ASC, invest_fname ASC, invest_lname ASC)";
+$sql = "ALTER TABLE vandyinvest.invest ADD FULLTEXT INDEX fullname (investid ASC, invest_division ASC, invest_status ASC, invest_homeinstitute ASC, invest_fname ASC, invest_lname ASC)";
 $rtnLoad = $prc->buildspecialindices($sql);        
 echo $rtnLoad . "\r\n";
 
-$aSQLOne = "insert into vandywstest.activeinvest SELECT i.*, now() FROM vandywstest.invest i left outer join vandywstest.activeinvest ai on i.investid = ai.investid where i.invest_status = 'Active' and ai.investid is null";
+$aSQLOne = "insert into vandyinvest.activeinvest SELECT i.*, now() FROM vandyinvest.invest i left outer join vandyinvest.activeinvest ai on i.investid = ai.investid where i.invest_status = 'Active' and ai.investid is null";
 $rtnLoad = $prc->registeractivesinvests($aSQLOne);
 echo $rtnLoad . "\r\n";
 
-$aSQLTwo = "insert into vandywstest.activeinvestproj SELECT pr.*, now() FROM vandywstest.investproj pr left outer join vandywstest.activeinvestproj apr on pr.projid = apr.projid where pr.proj_status = 'Active' and apr.projid is null";
+$aSQLTwo = "insert into vandyinvest.activeinvestproj SELECT pr.*, now() FROM vandyinvest.investproj pr left outer join vandyinvest.activeinvestproj apr on pr.projid = apr.projid where pr.proj_status = 'Active' and apr.projid is null";
 $rtnLoad = $prc->registeractivesinvests($aSQLTwo);
 echo $rtnLoad . "\r\n";
 
-$aSQLThree = "insert into vandywstest.activeinvesttissreq SELECT rq.*, now() FROM vandywstest.investtissreq rq left outer join vandywstest.activeinvesttissreq arq on rq.requestid = arq.requestid where rq.req_status = 'Active' and arq.requestid is null";
+$aSQLThree = "insert into vandyinvest.activeinvesttissreq SELECT rq.*, now() FROM vandyinvest.investtissreq rq left outer join vandyinvest.activeinvesttissreq arq on rq.requestid = arq.requestid where rq.req_status = 'Active' and arq.requestid is null";
 $rtnLoad = $prc->registeractivesinvests($aSQLThree);
 echo $rtnLoad . "\r\n";

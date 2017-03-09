@@ -1,0 +1,4 @@
+<?php 
+
+$authCHTNEast = "xxxxxxxxxxxxxxxxxxx"; //PASSWORD TO ACCESS LOCAL WEBSERVICE
+$authCHTNTQ = "xxxxxxxxx-xxxxxxxxx-xxxxxxxxx-xxxxxx-xxxxxxxxx"; //PASSWORD GIVEN TO ACCESS TQ WEBSERVICES

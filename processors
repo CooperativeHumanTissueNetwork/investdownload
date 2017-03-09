@@ -10,7 +10,10 @@ class processor {
         	$collection = json_encode($arrResponse);
         	return $collection;
     	}
-	
+
+        
+        
+        
     function buildTmpTblSQL($tblName, $tblDefinition) { 
             $tblDefData = json_decode($tblDefinition, true);
             $pkey = "";
@@ -38,7 +41,7 @@ class processor {
                         $ddl .= "," . strtolower($tblDefData[$i]['COLUMN_NAME']) . " " . $fldType . " " . $nullable; 
                 }
             }
-            $ddlStmt .= "CREATE TABLE vandywstest.tmp_" . $tblName  . " (" . $ddl . $pkey . ") ENGINE=myISAM DEFAULT CHARSET=utf8";
+            $ddlStmt .= "CREATE TABLE vandyinvest.tmp_" . $tblName  . " (" . $ddl . $pkey . ") ENGINE=myISAM DEFAULT CHARSET=utf8";
             return $ddlStmt;
         }
 
@@ -138,7 +141,7 @@ class processor {
             }
             $dataList .= ")  ";
         }            
-            $sqlToSend = " insert into vandywstest.tmp_" . $tblName . " "
+            $sqlToSend = " insert into vandyinvest.tmp_" . $tblName . " "
                     . "(" . $fieldList . ") values " . $dataList;
         return $sqlToSend;
     }
