@@ -44,11 +44,11 @@ class table {
                         . " where t.owner = 'INVESTIGATOR' and t.table_name = '" . strtoupper($whichTable) . "'";
             $passThis = json_encode(array("sql" => $tblDefSQL, "auth" => $authCHTNTQ));
             $url = "https://chtn.app.vumc.org/tq-data-services/query";
+            //echo "IN DEFINITION FOR " . $whichTable . "\r\n";
             $tblDefRtn = callRestAPI('POST',$url, $passThis);
             return $tblDefRtn;
         }
-    }
-
+    }        
 }
 
 function callRestAPI($method, $url, $data = false) { 

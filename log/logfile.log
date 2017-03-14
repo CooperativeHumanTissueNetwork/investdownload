@@ -1,0 +1,103 @@
+Data Pull Began: 2017-03-14 12:04
+------------------------------------------
+| 1) DROP ALL TEMPORARY TABLES (IF EXIST)|
+| 2) BUILD & LOAD TEMP HOLDER TABLES     |
+|   a) RETRIEVE TBL DEFINITIONS          |
+|   b) FORMAT/SEND DEFINITIONS TO LOCAL  |
+|   c) LOAD DATA TO LOCAL                |
+| 3) DROP YESTERDAY TABLES               |
+| 4) TODAY->YESTERDAY TABLES             |
+| 5) TMP->TODAY TABLES                   |
+------------------------------------------
+[1] DROPING TABLES
+------------------------------------------
+{"returnCode":1,"SQL":"DROP TABLE IF EXISTS vandyinvest.tmp_eastern_address"}
+{"returnCode":1,"SQL":"DROP TABLE IF EXISTS vandyinvest.tmp_eastern_contact"}
+{"returnCode":1,"SQL":"DROP TABLE IF EXISTS vandyinvest.tmp_eastern_courier"}
+{"returnCode":1,"SQL":"DROP TABLE IF EXISTS vandyinvest.tmp_eastern_funding"}
+{"returnCode":1,"SQL":"DROP TABLE IF EXISTS vandyinvest.tmp_eastern_payment"}
+{"returnCode":1,"SQL":"DROP TABLE IF EXISTS vandyinvest.tmp_eastern_project"}
+{"returnCode":1,"SQL":"DROP TABLE IF EXISTS vandyinvest.tmp_eastern_prepadditive"}
+{"returnCode":1,"SQL":"DROP TABLE IF EXISTS vandyinvest.tmp_eastern_reqdifficulty"}
+{"returnCode":1,"SQL":"DROP TABLE IF EXISTS vandyinvest.tmp_eastern_reqreviewtype"}
+{"returnCode":1,"SQL":"DROP TABLE IF EXISTS vandyinvest.tmp_eastern_tissuedetail"}
+{"returnCode":1,"SQL":"DROP TABLE IF EXISTS vandyinvest.tmp_eastern_tissueprep"}
+{"returnCode":1,"SQL":"DROP TABLE IF EXISTS vandyinvest.tmp_eastern_investigator"}
+{"returnCode":1,"SQL":"DROP TABLE IF EXISTS vandyinvest.tmp_eastern_tissuerequest"}
+{"returnCode":1,"SQL":"DROP TABLE IF EXISTS vandyinvest.tmp_invest"}
+{"returnCode":1,"SQL":"DROP TABLE IF EXISTS vandyinvest.tmp_investproj"}
+{"returnCode":1,"SQL":"DROP TABLE IF EXISTS vandyinvest.tmp_investtissreq"}
+------------------------------------------
+
+[2] BUILD & LOAD TEMPORARY TABLES
+------------------------------------------
+eastern_address
+eastern_contact
+eastern_courier
+eastern_funding
+eastern_payment
+eastern_project
+eastern_prepadditive
+eastern_reqdifficulty
+eastern_reqreviewtype
+eastern_tissuedetail
+eastern_tissueprep
+eastern_investigator
+eastern_tissuerequest
+------------------------------------------
+
+[3] DROP YESTERDAY TABLES
+------------------------------------------
+yesterday_eastern_address (eastern_address)
+yesterday_eastern_contact (eastern_contact)
+yesterday_eastern_courier (eastern_courier)
+yesterday_eastern_funding (eastern_funding)
+yesterday_eastern_payment (eastern_payment)
+yesterday_investproj (eastern_project)
+yesterday_eastern_prepadditive (eastern_prepadditive)
+yesterday_eastern_reqdifficulty (eastern_reqdifficulty)
+yesterday_eastern_reqreviewtype (eastern_reqreviewtype)
+yesterday_eastern_tissuedetail (eastern_tissuedetail)
+yesterday_eastern_tissueprep (eastern_tissueprep)
+yesterday_invest (eastern_investigator)
+yesterday_investtissreq (eastern_tissuerequest)
+------------------------------------------
+
+[4] MOVE TODAY->YESTERDAY TABLES
+------------------------------------------
+eastern_address (eastern_address)
+eastern_contact (eastern_contact)
+eastern_courier (eastern_courier)
+eastern_funding (eastern_funding)
+eastern_payment (eastern_payment)
+investproj (eastern_project)
+eastern_prepadditive (eastern_prepadditive)
+eastern_reqdifficulty (eastern_reqdifficulty)
+eastern_reqreviewtype (eastern_reqreviewtype)
+eastern_tissuedetail (eastern_tissuedetail)
+eastern_tissueprep (eastern_tissueprep)
+invest (eastern_investigator)
+investtissreq (eastern_tissuerequest)
+------------------------------------------
+{"returnCode":1,"SQL":"ALTER TABLE vandyinvest.tmp_eastern_address RENAME TO vandyinvest.eastern_address"} (eastern_address)
+{"returnCode":1,"SQL":"ALTER TABLE vandyinvest.tmp_eastern_contact RENAME TO vandyinvest.eastern_contact"} (eastern_contact)
+{"returnCode":1,"SQL":"ALTER TABLE vandyinvest.tmp_eastern_courier RENAME TO vandyinvest.eastern_courier"} (eastern_courier)
+{"returnCode":1,"SQL":"ALTER TABLE vandyinvest.tmp_eastern_funding RENAME TO vandyinvest.eastern_funding"} (eastern_funding)
+{"returnCode":1,"SQL":"ALTER TABLE vandyinvest.tmp_eastern_payment RENAME TO vandyinvest.eastern_payment"} (eastern_payment)
+{"returnCode":1,"SQL":"ALTER TABLE vandyinvest.tmp_eastern_project RENAME TO vandyinvest.investproj"} (eastern_project)
+{"returnCode":1,"SQL":"ALTER TABLE vandyinvest.tmp_eastern_prepadditive RENAME TO vandyinvest.eastern_prepadditive"} (eastern_prepadditive)
+{"returnCode":1,"SQL":"ALTER TABLE vandyinvest.tmp_eastern_reqdifficulty RENAME TO vandyinvest.eastern_reqdifficulty"} (eastern_reqdifficulty)
+{"returnCode":1,"SQL":"ALTER TABLE vandyinvest.tmp_eastern_reqreviewtype RENAME TO vandyinvest.eastern_reqreviewtype"} (eastern_reqreviewtype)
+{"returnCode":1,"SQL":"ALTER TABLE vandyinvest.tmp_eastern_tissuedetail RENAME TO vandyinvest.eastern_tissuedetail"} (eastern_tissuedetail)
+{"returnCode":1,"SQL":"ALTER TABLE vandyinvest.tmp_eastern_tissueprep RENAME TO vandyinvest.eastern_tissueprep"} (eastern_tissueprep)
+{"returnCode":1,"SQL":"ALTER TABLE vandyinvest.tmp_eastern_investigator RENAME TO vandyinvest.invest"} (eastern_investigator)
+{"returnCode":1,"SQL":"ALTER TABLE vandyinvest.tmp_eastern_tissuerequest RENAME TO vandyinvest.investtissreq"} (eastern_tissuerequest)
+------------------------------------------
+{"returnCode":1,"SQL":"ALTER TABLE vandyinvest.invest ADD FULLTEXT INDEX fullname (investid ASC, invest_division ASC, invest_status ASC, invest_homeinstitute ASC, invest_fname ASC, invest_lname ASC)"}
+{"returnCode":1,"SQL":"insert into vandyinvest.activeinvest SELECT i.*, now() FROM vandyinvest.invest i left outer join vandyinvest.activeinvest ai on i.investid = ai.investid where i.invest_status = 'Active' and ai.investid is null"}
+{"returnCode":1,"SQL":"insert into vandyinvest.activeinvestproj SELECT pr.*, now() FROM vandyinvest.investproj pr left outer join vandyinvest.activeinvestproj apr on pr.projid = apr.projid where pr.proj_status = 'Active' and apr.projid is null"}
+{"returnCode":1,"SQL":"insert into vandyinvest.activeinvesttissreq SELECT rq.*, now() FROM vandyinvest.investtissreq rq left outer join vandyinvest.activeinvesttissreq arq on rq.requestid = arq.requestid where rq.req_status = 'Active' and arq.requestid is null"}
+------------------------------------------
+
+
+|| COMPLETED: 2017-03-14 12:05

@@ -3,17 +3,14 @@
 class processor { 
 
     function functiondefinitions() {
-        	$rows = array();
-        	$rows[] = array('functionName' => 'listfunctions', 'description' => 'A simple listing of functions names in this end point', 'variables' => 'none');
-        	$rows[] = array('functionName' => 'gettable', 'description' => 'Blah Blah', 'variables' => 'tablename');
-        	$arrResponse = array('DATA' => $rows);
-        	$collection = json_encode($arrResponse);
-        	return $collection;
-    	}
+            $rows = array();
+            $rows[] = array('functionName' => 'listfunctions', 'description' => 'A simple listing of functions names in this end point', 'variables' => 'none');
+            $rows[] = array('functionName' => 'gettable', 'description' => 'Blah Blah', 'variables' => 'tablename');
+            $arrResponse = array('DATA' => $rows);
+            $collection = json_encode($arrResponse);
+            return $collection;
+    }
 
-        
-        
-        
     function buildTmpTblSQL($tblName, $tblDefinition) { 
             $tblDefData = json_decode($tblDefinition, true);
             $pkey = "";
@@ -60,7 +57,7 @@ class processor {
         $arrResponse = array('tblName' => 'tmp_'.$tblName,'insertSQL' => $sqlStmt, 'auth' => $authCHTNEast);
         $collection = json_encode($arrResponse);
         $tblDefRtn = callRestAPI('POST',$url, $collection);
-        echo $sqlStmt;
+        //echo $sqlStmt;
         return $tblDefRtn;                
     }
 
@@ -70,7 +67,7 @@ class processor {
         $arrResponse = array('tblName' => $tblName,'dropSQL' => $sqlStmt, 'auth' => $authCHTNEast);
         $collection = json_encode($arrResponse);
         $tblDefRtn = callRestAPI('POST',$url, $collection);
-        //echo $sqlStmt;
+        //echo $sqlStmt . "\r\n";
         //$tblDefRtn = 1;
         return $tblDefRtn; 
     }
@@ -110,7 +107,6 @@ class processor {
         $tblDefRtn = callRestAPI('POST',$url, $collection);
         return $tblDefRtn;        
     }
-    
     
     function parseTblRecords($tblName, $records) {
         $data  = json_decode($records, true); 

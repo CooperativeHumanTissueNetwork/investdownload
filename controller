@@ -1,32 +1,71 @@
-#!/usr/bin/php
 <?php
 include 'tablelisting';	
 include 'tables';
 include 'processors';
 
+$myfile = fopen("log/logfile.log", "w") or die("Unable to open file!");
+$txt = "Data Pull Began: " . date('Y-m-d H:i') . "\n";
+$txt .= "------------------------------------------\n";
+$txt .= "| 1) DROP ALL TEMPORARY TABLES (IF EXIST)|\n";
+$txt .= "| 2) BUILD & LOAD TEMP HOLDER TABLES     |\n";
+$txt .= "|   a) RETRIEVE TBL DEFINITIONS          |\n";
+$txt .= "|   b) FORMAT/SEND DEFINITIONS TO LOCAL  |\n";
+$txt .= "|   c) LOAD DATA TO LOCAL                |\n";
+$txt .= "| 3) DROP YESTERDAY TABLES               |\n";
+$txt .= "| 4) TODAY->YESTERDAY TABLES             |\n";
+$txt .= "| 5) TMP->TODAY TABLES                   |\n";
+$txt .= "| 6) BUILD INDICIES AND ACTIV            |\n";
+$txt .= "------------------------------------------";
+fwrite($myfile, $txt);
+
 $tableDataList = json_decode($tableCollection, true);
 $tbl = new table(); 
 $prc = new processor();
 
+$txt = "\n[1] DROPING TABLES\n";
+$txt .= "------------------------------------------\n";
+fwrite($myfile, $txt);
+for ($i = 0; $i < count($tableDataList['DATA']); $i++) {     
+    $tblname = $tableDataList['DATA'][$i]['table'];
+    $rsp = $prc->runDropList($tblname,'DROP TABLE IF EXISTS vandyinvest.tmp_' . $tblname);       
+    fwrite($myfile, $rsp . "\n");
+}
+$tblname = "invest";
+$rsp = $prc->runDropList($tblname,'DROP TABLE IF EXISTS vandyinvest.tmp_' . $tblname);  
+fwrite($myfile, $rsp . "\n");
+$tblname = "investproj";
+$rsp = $prc->runDropList($tblname,'DROP TABLE IF EXISTS vandyinvest.tmp_' . $tblname);    
+fwrite($myfile, $rsp . "\n");
+$tblname = "investtissreq";  
+$rsp = $prc->runDropList($tblname,'DROP TABLE IF EXISTS vandyinvest.tmp_' . $tblname); 
+fwrite($myfile, $rsp . "\n");
+$txt = "------------------------------------------\n";
+fwrite($myfile, $txt);
 
+
+$txt = "\n[2] BUILD & LOAD TEMPORARY TABLES\n";
+$txt .= "------------------------------------------\n";
+fwrite($myfile, $txt);
 for ($i = 0; $i < count($tableDataList['DATA']); $i++) { 
-        //BUILD TMP HOLDER TABLES FROM TQ DATA STRUCTURE
+        fwrite($myfile, $tableDataList['DATA'][$i]['table'] . "\n");        
         $dataTblDef = $tbl->getTableDefinitions($tableDataList['DATA'][$i]['table']);          
         $sqlStatement = $prc->buildTmpTblSQL($tableDataList['DATA'][$i]['table'], $dataTblDef);
         $rtn = $prc->runSQL($tableDataList['DATA'][$i]['table'], $sqlStatement);        
-        echo $rtn . "\r\n";
-        
         //LOAD TEMPORARY TABLES FROM TQ
         $dataTbl = $tbl->getTableData($tableDataList['DATA'][$i]['table']);
         $loadSQL = $prc->parseTblRecords($tableDataList['DATA'][$i]['table'],$dataTbl);
         $rtnLoad = $prc->runSQLLoad($tableDataList['DATA'][$i]['table'], $loadSQL);        
-        echo $rtnLoad . "\r\n";
 }
-
+$txt = "------------------------------------------\n";
+fwrite($myfile, $txt);
 //(NOT IN THIS RELEASE) CHECK MAKE SURE RECORDS EXIST 
 
+
+$txt = "\n[3] DROP YESTERDAY TABLES\n";
+$txt .= "------------------------------------------\n";
+fwrite($myfile, $txt);
 for ($i = 0; $i < count($tableDataList['DATA']); $i++) { 
-    //DROP YESTERDAY TABLES
+    //DROP YESTERDAY TABLES    
     $tblname = $tableDataList['DATA'][$i]['table'];
     if (strtolower($tableDataList['DATA'][$i]['table']) === 'eastern_investigator') {
         $tblname = "invest";
@@ -38,11 +77,17 @@ for ($i = 0; $i < count($tableDataList['DATA']); $i++) {
         $tblname = "investtissreq";
     }
     $rsp = $prc->runDropList($tblname,'DROP TABLE IF EXISTS vandyinvest.yesterday_' . $tblname);
-    echo $rsp . "\r\n";    
+    fwrite($myfile, 'yesterday_' . $tblname . " (" .  $tableDataList['DATA'][$i]['table'] . ")\n");        
 }
+$txt = "------------------------------------------\n";
+fwrite($myfile, $txt);
 
+
+$txt = "\n[4] MOVE TODAY->YESTERDAY TABLES\n";
+$txt .= "------------------------------------------\n";
+fwrite($myfile, $txt);
 for ($i = 0; $i < count($tableDataList['DATA']); $i++) { 
-    //MOVE EXISTING TABLES TO YESTERDAY
+    //MOVE EXISTING TABLES TOi YESTERDAY
     $tblname = $tableDataList['DATA'][$i]['table'];
     if (strtolower($tableDataList['DATA'][$i]['table']) === 'eastern_investigator') {
        $tblname = "invest";
@@ -55,9 +100,13 @@ for ($i = 0; $i < count($tableDataList['DATA']); $i++) {
     }
     $sql = "ALTER TABLE vandyinvest." . $tblname . " RENAME TO vandyinvest.yesterday_" . $tblname;
     $rsp = $prc->runToYesterdayList($tblname,$sql);
-    echo $rsp . "\r\n";    
+    fwrite($myfile, $tblname . " (" .  $tableDataList['DATA'][$i]['table'] . ")\n");        
 }
+$txt = "------------------------------------------\n";
+fwrite($myfile, $txt);
 
+$txt = "\n[5] MOVE TMP->TODAY TABLES\n";
+$txt .= "------------------------------------------\n";
 for ($i = 0; $i < count($tableDataList['DATA']); $i++) { 
     //MOVE TMP TO TODAY
     $otblname = $tableDataList['DATA'][$i]['table'];
@@ -73,23 +122,35 @@ for ($i = 0; $i < count($tableDataList['DATA']); $i++) {
     }    
     $sql = "ALTER TABLE vandyinvest." .  strtolower($tblname) . " RENAME TO vandyinvest." . strtolower($otblname) . "";
     $rsp = $prc->makeTodayList(strtolower($tblname), $sql);
-    echo $rsp . "\r\n";
+    fwrite($myfile, $rsp . " (" .  $tableDataList['DATA'][$i]['table'] . ")\n");        
 }
+$txt = "------------------------------------------\n";
+fwrite($myfile, $txt);
 
-
+$txt = "\n[6] BUILD INDICES AND ACTIVES\n";
+$txt .= "------------------------------------------\n";
 //BUILD SPECIAL INDICES ON TODAY TABLES and REGISTER ACTIVES
 $sql = "ALTER TABLE vandyinvest.invest ADD FULLTEXT INDEX fullname (investid ASC, invest_division ASC, invest_status ASC, invest_homeinstitute ASC, invest_fname ASC, invest_lname ASC)";
-$rtnLoad = $prc->buildspecialindices($sql);        
-echo $rtnLoad . "\r\n";
+$rtnLoad = $prc->buildspecialindices($sql);   
+fwrite($myfile, $rtnLoad . "\n");  
 
 $aSQLOne = "insert into vandyinvest.activeinvest SELECT i.*, now() FROM vandyinvest.invest i left outer join vandyinvest.activeinvest ai on i.investid = ai.investid where i.invest_status = 'Active' and ai.investid is null";
 $rtnLoad = $prc->registeractivesinvests($aSQLOne);
-echo $rtnLoad . "\r\n";
+fwrite($myfile, $rtnLoad . "\n");  
 
 $aSQLTwo = "insert into vandyinvest.activeinvestproj SELECT pr.*, now() FROM vandyinvest.investproj pr left outer join vandyinvest.activeinvestproj apr on pr.projid = apr.projid where pr.proj_status = 'Active' and apr.projid is null";
 $rtnLoad = $prc->registeractivesinvests($aSQLTwo);
-echo $rtnLoad . "\r\n";
+fwrite($myfile, $rtnLoad . "\n");  
 
 $aSQLThree = "insert into vandyinvest.activeinvesttissreq SELECT rq.*, now() FROM vandyinvest.investtissreq rq left outer join vandyinvest.activeinvesttissreq arq on rq.requestid = arq.requestid where rq.req_status = 'Active' and arq.requestid is null";
 $rtnLoad = $prc->registeractivesinvests($aSQLThree);
-echo $rtnLoad . "\r\n";
+fwrite($myfile, $rtnLoad . "\n");  
+$txt = "------------------------------------------\n";
+fwrite($myfile, $txt);
+
+$txt = "\n\n|| COMPLETED: " . date('Y-m-d H:i') . "\n";
+fwrite($myfile, $txt);
+
+fclose($myfile);
+
+exit;
